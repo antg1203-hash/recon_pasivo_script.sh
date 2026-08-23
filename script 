@@ -1,72 +1,72 @@
 #!/bin/bash
-# recon_pasivo.sh - Reconocimiento pasivo de dominios
-# Uso: ./recon_pasivo.sh dominio.com
+# passive_recon.sh - Passive domain reconnaissance
+# Usage: ./passive_recon.sh domain.com
 
-set -euo pipefail  # -e: salir si hay error, -u: error si variable no existe, -o pipefail: detectar errores en pipes
+set -euo pipefail  # -e: exit on error, -u: error if var undefined, -o pipefail: detect errors in pipes
 
-# Validación de argumentos
+# Argument validation
 if [ $# -ne 1 ]; then
-    echo "❌ Uso: $0 <dominio>"
-    echo "Ejemplo: $0 example.com"
+    echo "❌ Usage: $0 <domain>"
+    echo "Example: $0 example.com"
     exit 1
 fi
 
 DOMAIN=$1
 
-# Validar formato del dominio
+# Validate domain format
 if [[ ! $DOMAIN =~ ^[a-zA-Z0-9.-]+$ ]]; then
-    echo "❌ Error: Dominio inválido '$DOMAIN'"
-    echo "El dominio debe contener solo letras, números, puntos y guiones"
+    echo "❌ Error: Invalid domain '$DOMAIN'"
+    echo "Domain must contain only letters, numbers, dots and hyphens"
     exit 1
 fi
 
 OUTPUT_DIR="recon_$DOMAIN"
 LOG_FILE="$OUTPUT_DIR/recon.log"
 
-# Crear directorio
+# Create directory
 mkdir -p "$OUTPUT_DIR"
 
-echo "[*] Iniciando reconocimiento de $DOMAIN..." | tee "$LOG_FILE"
+echo "[*] Starting reconnaissance for $DOMAIN..." | tee "$LOG_FILE"
 
-# Verificar herramientas necesarias
+# Check for required tools
 if ! command -v waybackurls &> /dev/null; then
-    echo "❌ Error: 'waybackurls' no instalado. Instala con: go install github.com/tomnomnom/waybackurls@latest"
+    echo "❌ Error: 'waybackurls' not installed. Install with: go install github.com/tomnomnom/waybackurls@latest"
     exit 1
 fi
 
-# 1. Extrae robots.txt
-echo "[*] Extrayendo robots.txt..." | tee -a "$LOG_FILE"
+# 1. Extract robots.txt
+echo "[*] Extracting robots.txt..." | tee -a "$LOG_FILE"
 if curl -sfL "https://$DOMAIN/robots.txt" > "$OUTPUT_DIR/robots.txt" 2>/dev/null; then
-    echo "✓ robots.txt descargado" | tee -a "$LOG_FILE"
+    echo "✓ robots.txt downloaded" | tee -a "$LOG_FILE"
 else
-    echo "⚠ No se pudo obtener robots.txt" | tee -a "$LOG_FILE"
+    echo "⚠ Could not retrieve robots.txt" | tee -a "$LOG_FILE"
 fi
 
-# 2. URLs históricas
-echo "[*] Buscando URLs históricas..." | tee -a "$LOG_FILE"
+# 2. Historical URLs
+echo "[*] Searching for historical URLs..." | tee -a "$LOG_FILE"
 if waybackurls "$DOMAIN" | sort -u > "$OUTPUT_DIR/wayback.txt" 2>/dev/null; then
     WAYBACK_COUNT=$(wc -l < "$OUTPUT_DIR/wayback.txt")
-    echo "✓ $WAYBACK_COUNT URLs encontradas en Wayback Machine" | tee -a "$LOG_FILE"
+    echo "✓ $WAYBACK_COUNT URLs found in Wayback Machine" | tee -a "$LOG_FILE"
 else
-    echo "⚠ No se obtuvieron URLs del Wayback" | tee -a "$LOG_FILE"
+    echo "⚠ No URLs retrieved from Wayback" | tee -a "$LOG_FILE"
 fi
 
-# 3. Filtrar endpoints sensibles
-echo "[*] Filtrando endpoints sensibles..." | tee -a "$LOG_FILE"
+# 3. Filter sensitive endpoints
+echo "[*] Filtering sensitive endpoints..." | tee -a "$LOG_FILE"
 if [ -s "$OUTPUT_DIR/wayback.txt" ]; then
     if grep -iE "api|admin|backup|config|db|debug|internal|secret|key|password|token" \
         "$OUTPUT_DIR/wayback.txt" > "$OUTPUT_DIR/endpoints.txt" 2>/dev/null; then
         ENDPOINTS_COUNT=$(wc -l < "$OUTPUT_DIR/endpoints.txt")
-        echo "✓ $ENDPOINTS_COUNT endpoints sensibles encontrados" | tee -a "$LOG_FILE"
+        echo "✓ $ENDPOINTS_COUNT sensitive endpoints found" | tee -a "$LOG_FILE"
     else
-        echo "⚠ Sin endpoints sensibles encontrados" | tee -a "$LOG_FILE"
+        echo "⚠ No sensitive endpoints found" | tee -a "$LOG_FILE"
     fi
 else
-    echo "⚠ wayback.txt vacío - no hay URLs para analizar" | tee -a "$LOG_FILE"
+    echo "⚠ wayback.txt empty - no URLs to analyze" | tee -a "$LOG_FILE"
 fi
 
-# Resumen
+# Summary
 echo "" | tee -a "$LOG_FILE"
-echo "[+] ✅ Reconocimiento completado en $OUTPUT_DIR" | tee -a "$LOG_FILE"
-echo "[+] Archivos generados:" | tee -a "$LOG_FILE"
+echo "[+] ✅ Reconnaissance completed in $OUTPUT_DIR" | tee -a "$LOG_FILE"
+echo "[+] Generated files:" | tee -a "$LOG_FILE"
 ls -lh "$OUTPUT_DIR" | tail -n +2 | awk '{print "    " $9 " (" $5 ")"}' | tee -a "$LOG_FILE"
