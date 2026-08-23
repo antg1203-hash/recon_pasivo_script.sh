@@ -2,9 +2,9 @@
 # recon_pasivo.sh - Reconocimiento pasivo de dominios
 # Uso: ./recon_pasivo.sh dominio.com
 
-set -e  # Salir si hay error
-set -o pipefail
-# Validación
+set -euo pipefail  # -e: salir si hay error, -u: error si variable no existe, -o pipefail: detectar errores en pipes
+
+# Validación de argumentos
 if [ $# -ne 1 ]; then
     echo "❌ Uso: $0 <dominio>"
     echo "Ejemplo: $0 example.com"
@@ -12,6 +12,14 @@ if [ $# -ne 1 ]; then
 fi
 
 DOMAIN=$1
+
+# Validar formato del dominio
+if [[ ! $DOMAIN =~ ^[a-zA-Z0-9.-]+$ ]]; then
+    echo "❌ Error: Dominio inválido '$DOMAIN'"
+    echo "El dominio debe contener solo letras, números, puntos y guiones"
+    exit 1
+fi
+
 OUTPUT_DIR="recon_$DOMAIN"
 LOG_FILE="$OUTPUT_DIR/recon.log"
 
@@ -45,12 +53,16 @@ fi
 
 # 3. Filtrar endpoints sensibles
 echo "[*] Filtrando endpoints sensibles..." | tee -a "$LOG_FILE"
-if grep -iE "api|admin|backup|config|db|debug|internal|secret|key|password|token" \
-    "$OUTPUT_DIR/wayback.txt" > "$OUTPUT_DIR/endpoints.txt" 2>/dev/null; then
-    ENDPOINTS_COUNT=$(wc -l < "$OUTPUT_DIR/endpoints.txt")
-    echo "✓ $ENDPOINTS_COUNT endpoints sensibles encontrados" | tee -a "$LOG_FILE"
+if [ -s "$OUTPUT_DIR/wayback.txt" ]; then
+    if grep -iE "api|admin|backup|config|db|debug|internal|secret|key|password|token" \
+        "$OUTPUT_DIR/wayback.txt" > "$OUTPUT_DIR/endpoints.txt" 2>/dev/null; then
+        ENDPOINTS_COUNT=$(wc -l < "$OUTPUT_DIR/endpoints.txt")
+        echo "✓ $ENDPOINTS_COUNT endpoints sensibles encontrados" | tee -a "$LOG_FILE"
+    else
+        echo "⚠ Sin endpoints sensibles encontrados" | tee -a "$LOG_FILE"
+    fi
 else
-    echo "⚠ No se encontraron endpoints sensibles" | tee -a "$LOG_FILE"
+    echo "⚠ wayback.txt vacío - no hay URLs para analizar" | tee -a "$LOG_FILE"
 fi
 
 # Resumen
