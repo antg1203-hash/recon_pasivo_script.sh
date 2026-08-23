@@ -1,1 +1,1 @@
-# script-
+# recon_pasivo_script.sh
