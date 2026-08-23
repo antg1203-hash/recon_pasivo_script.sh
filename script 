@@ -1,16 +1,60 @@
 #!/bin/bash
-# recon_pasivo.sh - Uso: ./recon_pasivo.sh dominio.com
+# recon_pasivo.sh - Reconocimiento pasivo de dominios
+# Uso: ./recon_pasivo.sh dominio.com
+
+set -e  # Salir si hay error
+
+# Validación
+if [ $# -ne 1 ]; then
+    echo "❌ Uso: $0 <dominio>"
+    echo "Ejemplo: $0 example.com"
+    exit 1
+fi
+
 DOMAIN=$1
 OUTPUT_DIR="recon_$DOMAIN"
+LOG_FILE="$OUTPUT_DIR/recon.log"
+
+# Crear directorio
 mkdir -p "$OUTPUT_DIR"
 
-echo "[*] Extrayendo robots.txt..."
-curl -s -L "https://$DOMAIN/robots.txt" > "$OUTPUT_DIR/robots.txt"
+echo "[*] Iniciando reconocimiento de $DOMAIN..." | tee "$LOG_FILE"
 
-echo "[*] Buscando URLs históricas..."
-waybackurls "$DOMAIN" | sort -u > "$OUTPUT_DIR/wayback.txt"
+# Verificar herramientas necesarias
+if ! command -v waybackurls &> /dev/null; then
+    echo "❌ Error: 'waybackurls' no instalado. Instala con: go install github.com/tomnomnom/waybackurls@latest"
+    exit 1
+fi
 
-echo "[*] Filtrando endpoints sensibles..."
-grep -iE "api|admin|backup|config|db|debug|internal" "$OUTPUT_DIR/wayback.txt" > "$OUTPUT_DIR/endpoints.txt"
+# 1. Extrae robots.txt
+echo "[*] Extrayendo robots.txt..." | tee -a "$LOG_FILE"
+if curl -s -L "https://$DOMAIN/robots.txt" > "$OUTPUT_DIR/robots.txt" 2>/dev/null; then
+    echo "✓ robots.txt descargado" | tee -a "$LOG_FILE"
+else
+    echo "⚠ No se pudo obtener robots.txt" | tee -a "$LOG_FILE"
+fi
 
-echo "[+] Resultados guardados en $OUTPUT_DIR"
+# 2. URLs históricas
+echo "[*] Buscando URLs históricas..." | tee -a "$LOG_FILE"
+if waybackurls "$DOMAIN" | sort -u > "$OUTPUT_DIR/wayback.txt" 2>/dev/null; then
+    WAYBACK_COUNT=$(wc -l < "$OUTPUT_DIR/wayback.txt")
+    echo "✓ $WAYBACK_COUNT URLs encontradas en Wayback Machine" | tee -a "$LOG_FILE"
+else
+    echo "⚠ No se obtuvieron URLs del Wayback" | tee -a "$LOG_FILE"
+fi
+
+# 3. Filtrar endpoints sensibles
+echo "[*] Filtrando endpoints sensibles..." | tee -a "$LOG_FILE"
+if grep -iE "api|admin|backup|config|db|debug|internal|secret|key|password|token" \
+    "$OUTPUT_DIR/wayback.txt" > "$OUTPUT_DIR/endpoints.txt" 2>/dev/null; then
+    ENDPOINTS_COUNT=$(wc -l < "$OUTPUT_DIR/endpoints.txt")
+    echo "✓ $ENDPOINTS_COUNT endpoints sensibles encontrados" | tee -a "$LOG_FILE"
+else
+    echo "⚠ No se encontraron endpoints sensibles" | tee -a "$LOG_FILE"
+fi
+
+# Resumen
+echo "" | tee -a "$LOG_FILE"
+echo "[+] ✅ Reconocimiento completado en $OUTPUT_DIR" | tee -a "$LOG_FILE"
+echo "[+] Archivos generados:" | tee -a "$LOG_FILE"
+ls -lh "$OUTPUT_DIR" | tail -n +2 | awk '{print "    " $9 " (" $5 ")"}' | tee -a "$LOG_FILE"
