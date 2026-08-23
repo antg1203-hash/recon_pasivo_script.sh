@@ -1,6 +1,6 @@
-# 🔍 Recon Pasivo Script
+# 🔍 Passive Recon Script
 
-> **Herramienta de reconocimiento pasivo automatizado** para identificar información pública de dominios sin contacto directo. Extrae URLs históricas, endpoints sensibles y más.
+> **Automated passive reconnaissance tool** to identify public information about domains without direct contact. Extracts historical URLs, sensitive endpoints and more.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bash](https://img.shields.io/badge/Shell_Script-%23121011?logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
@@ -8,35 +8,35 @@
 
 ---
 
-## 📋 Tabla de Contenidos
+## 📋 Table of Contents
 
-- [¿Qué hace?](#qué-hace)
-- [Requisitos](#requisitos)
-- [Instalación](#instalación)
-- [Uso](#uso)
-- [Ejemplos](#ejemplos)
-- [Estructura de salida](#estructura-de-salida)
-- [Características](#características)
-- [Solución de problemas](#solución-de-problemas)
-- [Licencia](#licencia)
-
----
-
-## 🎯 ¿Qué hace?
-
-Este script automatiza el reconocimiento pasivo de un dominio:
-
-✅ **Extrae `robots.txt`** - Descubre qué paths el sitio intenta ocultar de buscadores  
-✅ **Busca URLs históricas** - Recupera snapshots de Wayback Machine  
-✅ **Filtra endpoints sensibles** - Identifica paths sospechosos (api, admin, backup, etc.)  
-✅ **Genera logs detallados** - Resumen completo de la ejecución  
-✅ **Manejo robusto de errores** - Validación de dominios y herramientas  
+- [What does it do?](#what-does-it-do)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Examples](#examples)
+- [Output Structure](#output-structure)
+- [Features](#features)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
 
 ---
 
-## 📦 Requisitos
+## 🎯 What does it do?
 
-### Herramientas del sistema
+This script automates passive reconnaissance of a domain:
+
+✅ **Extracts `robots.txt`** - Discovers which paths the site tries to hide from search engines  
+✅ **Searches historical URLs** - Retrieves snapshots from Wayback Machine  
+✅ **Filters sensitive endpoints** - Identifies suspicious paths (api, admin, backup, etc.)  
+✅ **Generates detailed logs** - Complete execution summary  
+✅ **Robust error handling** - Domain and tool validation  
+
+---
+
+## 📦 Requirements
+
+### System Tools
 - `bash` (4.0+)
 - `curl` 
 - `grep`
@@ -44,98 +44,98 @@ Este script automatiza el reconocimiento pasivo de un dominio:
 - `awk`
 - `wc`
 
-### Herramientas externas
+### External Tools
 
-| Herramienta | Instalación |
-|-------------|-------------|
+| Tool | Installation |
+|------|--------------|
 | **waybackurls** | `go install github.com/tomnomnom/waybackurls@latest` |
 
-> 💡 **Asegúrate que `$GOPATH/bin` está en tu `$PATH`**
+> 💡 **Make sure `$GOPATH/bin` is in your `$PATH`**
 
 ---
 
-## 🚀 Instalación
+## 🚀 Installation
 
-### 1️⃣ Clonar el repositorio
+### 1️⃣ Clone the repository
 
 ```bash
 git clone https://github.com/antg1203-hash/recon_pasivo_script.sh.git
 cd recon_pasivo_script.sh
 ```
 
-### 2️⃣ Instalar dependencias
+### 2️⃣ Install dependencies
 
 ```bash
-# En Ubuntu/Debian
+# On Ubuntu/Debian
 sudo apt-get install curl grep
 
-# Instalar waybackurls
+# Install waybackurls
 go install github.com/tomnomnom/waybackurls@latest
 ```
 
-### 3️⃣ Dar permisos de ejecución
+### 3️⃣ Make the script executable
 
 ```bash
-chmod +x recon_pasivo.sh
+chmod +x script
 ```
 
-### 4️⃣ (Opcional) Agregar a PATH
+### 4️⃣ (Optional) Add to PATH
 
 ```bash
-sudo ln -s $(pwd)/recon_pasivo.sh /usr/local/bin/recon_pasivo
-# Ahora puedes ejecutar: recon_pasivo example.com
-```
-
----
-
-## 💻 Uso
-
-### Sintaxis básica
-
-```bash
-./recon_pasivo.sh <dominio>
-```
-
-### Ejemplos
-
-```bash
-# Reconocimiento simple
-./recon_pasivo.sh example.com
-
-# Con dominio subdividido
-./recon_pasivo.sh sub.example.com
-
-# Ver logs en tiempo real
-./recon_pasivo.sh google.com && cat recon_google.com/recon.log
+sudo ln -s $(pwd)/script /usr/local/bin/passive_recon
+# Now you can run: passive_recon example.com
 ```
 
 ---
 
-## 📊 Estructura de Salida
+## 💻 Usage
 
-El script crea una carpeta `recon_<dominio>/` con:
+### Basic Syntax
+
+```bash
+./script <domain>
+```
+
+### Examples
+
+```bash
+# Simple reconnaissance
+./script example.com
+
+# With subdomain
+./script sub.example.com
+
+# View logs in real-time
+./script google.com && cat recon_google.com/recon.log
+```
+
+---
+
+## 📊 Output Structure
+
+The script creates a `recon_<domain>/` folder with:
 
 ```
 recon_example.com/
-├── recon.log           # Log detallado de la ejecución
-├── robots.txt          # Archivo robots.txt del sitio
-├── wayback.txt         # URLs históricas encontradas
-└── endpoints.txt       # Endpoints sensibles filtrados
+├── recon.log           # Detailed execution log
+├── robots.txt          # Site's robots.txt file
+├── wayback.txt         # Historical URLs found
+└── endpoints.txt       # Filtered sensitive endpoints
 ```
 
-### Ejemplo de salida
+### Example Output
 
 ```
-[*] Iniciando reconocimiento de example.com...
-[*] Extrayendo robots.txt...
-✓ robots.txt descargado
-[*] Buscando URLs históricas...
-✓ 142 URLs encontradas en Wayback Machine
-[*] Filtrando endpoints sensibles...
-✓ 4 endpoints sensibles encontrados
+[*] Starting reconnaissance for example.com...
+[*] Extracting robots.txt...
+✓ robots.txt downloaded
+[*] Searching for historical URLs...
+✓ 142 URLs found in Wayback Machine
+[*] Filtering sensitive endpoints...
+✓ 4 sensitive endpoints found
 
-[+] ✅ Reconocimiento completado en recon_example.com
-[+] Archivos generados:
+[+] ✅ Reconnaissance completed in recon_example.com
+[+] Generated files:
     robots.txt (1.2K)
     wayback.txt (8.4K)
     endpoints.txt (310B)
@@ -144,137 +144,137 @@ recon_example.com/
 
 ---
 
-## ✨ Características
+## ✨ Features
 
-### 🔒 Seguridad
-- ✅ Validación de dominios con regex
-- ✅ Detección de variables no definidas (`set -u`)
-- ✅ Manejo de errores en pipes (`set -o pipefail`)
-- ✅ Prevención de inyecciones de comandos
+### 🔒 Security
+- ✅ Domain validation with regex
+- ✅ Undefined variable detection (`set -u`)
+- ✅ Error handling in pipes (`set -o pipefail`)
+- ✅ Command injection prevention
 
 ### 📝 Logging
-- ✅ Log file persistente
-- ✅ Salida en pantalla + archivo simultáneamente
-- ✅ Contadores de resultados
-- ✅ Información de tamaños de archivos
+- ✅ Persistent log file
+- ✅ Screen + file output simultaneously
+- ✅ Result counters
+- ✅ File size information
 
-### 🛡️ Robustez
-- ✅ Verificación de herramientas antes de ejecutar
-- ✅ Manejo gracioso de fallos
-- ✅ Validación de archivos antes de procesarlos
+### 🛡️ Robustness
+- ✅ Tool verification before execution
+- ✅ Graceful failure handling
+- ✅ File validation before processing
 
 ---
 
-## 🔧 Solución de Problemas
+## 🔧 Troubleshooting
 
 ### ❌ Error: "waybackurls: command not found"
 
 ```bash
-# Asegúrate de tener Go instalado
+# Make sure Go is installed
 go version
 
-# Instala waybackurls
+# Install waybackurls
 go install github.com/tomnomnom/waybackurls@latest
 
-# Verifica que está en PATH
+# Verify it's in PATH
 which waybackurls
 
-# Si no aparece, agrega a .bashrc o .zshrc
+# If not found, add to .bashrc or .zshrc
 export PATH="$PATH:$(go env GOPATH)/bin"
 source ~/.bashrc
 ```
 
-### ❌ Error: "Dominio inválido"
+### ❌ Error: "Invalid domain"
 
-El dominio contiene caracteres no permitidos. Usa solo:
-- Letras: `a-z`, `A-Z`
-- Números: `0-9`
-- Puntos: `.`
-- Guiones: `-`
+The domain contains invalid characters. Use only:
+- Letters: `a-z`, `A-Z`
+- Numbers: `0-9`
+- Dots: `.`
+- Hyphens: `-`
 
 ```bash
-# ❌ Incorrecto
-./recon_pasivo.sh example.com/path
+# ❌ Wrong
+./script example.com/path
 
-# ✅ Correcto
-./recon_pasivo.sh example.com
+# ✅ Correct
+./script example.com
 ```
 
-### ⚠️ Sin resultados en Wayback Machine
+### ⚠️ No results from Wayback Machine
 
-Algunos dominios nuevos o privados no tienen snapshots. Verifica:
+Some new or private domains have no snapshots. Verify:
 ```bash
-# Manualmente en el navegador
+# Manually in your browser
 https://web.archive.org/web/*/example.com
 ```
 
-### 📝 Ver los logs
+### 📝 View the logs
 
 ```bash
-# Log completo
+# Full log
 cat recon_example.com/recon.log
 
-# Últimas líneas
+# Last lines
 tail -f recon_example.com/recon.log
 ```
 
 ---
 
-## ⚖️ Disclaimer Legal
+## ⚖️ Legal Disclaimer
 
-**⚠️ IMPORTANTE**
+**⚠️ IMPORTANT**
 
-Este script es solo para:
-- ✅ Educación y aprendizaje
-- ✅ Pruebas autorizadas en dominios propios
-- ✅ Auditorías de seguridad con permiso
+This script is for:
+- ✅ Education and learning
+- ✅ Authorized testing on your own domains
+- ✅ Security audits with permission
 
-**Prohibido:**
-- ❌ Usar contra dominios sin autorización
-- ❌ Recopilación no autorizada de datos
-- ❌ Acceso no autorizado a sistemas
+**Prohibited:**
+- ❌ Use against domains without authorization
+- ❌ Unauthorized data collection
+- ❌ Unauthorized access to systems
 
-El autor no es responsable de usos malintencionados.
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia **MIT**.
-
-Ver [LICENSE](LICENSE) para más detalles.
+The author is not responsible for malicious use.
 
 ---
 
-## 👤 Autor
+## 📄 License
+
+This project is licensed under the **MIT License**.
+
+See [LICENSE](LICENSE) for details.
+
+---
+
+## 👤 Author
 
 **antg1203-hash**
 
 - GitHub: [@antg1203-hash](https://github.com/antg1203-hash)
-- Repositorio: [recon_pasivo_script.sh](https://github.com/antg1203-hash/recon_pasivo_script.sh)
+- Repository: [recon_pasivo_script.sh](https://github.com/antg1203-hash/recon_pasivo_script.sh)
 
 ---
 
-## 🤝 Contribuciones
+## 🤝 Contributing
 
-¡Los PRs son bienvenidos! Para cambios mayores:
+Pull requests are welcome! For major changes:
 
-1. Fork el repo
-2. Crea una rama (`git checkout -b feature/mejora`)
-3. Commit tus cambios (`git commit -am 'Add mejora'`)
-4. Push a la rama (`git push origin feature/mejora`)
-5. Abre un Pull Request
+1. Fork the repo
+2. Create a branch (`git checkout -b feature/improvement`)
+3. Commit your changes (`git commit -am 'Add improvement'`)
+4. Push to the branch (`git push origin feature/improvement`)
+5. Open a Pull Request
 
 ---
 
-## 📞 Soporte
+## 📞 Support
 
-¿Problemas? Abre una [issue](https://github.com/antg1203-hash/recon_pasivo_script.sh/issues)
+Having issues? Open an [issue](https://github.com/antg1203-hash/recon_pasivo_script.sh/issues)
 
 ---
 
 <div align="center">
 
-**⭐ Si te resultó útil, dale una estrella!**
+**⭐ If you found this useful, give it a star!**
 
 </div>
