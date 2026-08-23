@@ -10,15 +10,18 @@
 
 ## 📋 Table of Contents
 
-- [What does it do?](#what-does-it-do)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Examples](#examples)
-- [Output Structure](#output-structure)
-- [Features](#features)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
+- [What does it do?](#-what-does-it-do)
+- [Requirements](#-requirements)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Output Structure](#-output-structure)
+- [Features](#-features)
+- [Troubleshooting](#-troubleshooting)
+- [Legal Disclaimer](#️-legal-disclaimer)
+- [License](#-license)
+- [Author](#-author)
+- [Contributing](#-contributing)
+- [Support](#-support)
 
 ---
 
