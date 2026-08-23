@@ -1,0 +1,16 @@
+#!/bin/bash
+# recon_pasivo.sh - Uso: ./recon_pasivo.sh dominio.com
+DOMAIN=$1
+OUTPUT_DIR="recon_$DOMAIN"
+mkdir -p "$OUTPUT_DIR"
+
+echo "[*] Extrayendo robots.txt..."
+curl -s -L "https://$DOMAIN/robots.txt" > "$OUTPUT_DIR/robots.txt"
+
+echo "[*] Buscando URLs históricas..."
+waybackurls "$DOMAIN" | sort -u > "$OUTPUT_DIR/wayback.txt"
+
+echo "[*] Filtrando endpoints sensibles..."
+grep -iE "api|admin|backup|config|db|debug|internal" "$OUTPUT_DIR/wayback.txt" > "$OUTPUT_DIR/endpoints.txt"
+
+echo "[+] Resultados guardados en $OUTPUT_DIR"
