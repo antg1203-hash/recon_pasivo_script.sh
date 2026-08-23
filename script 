@@ -3,7 +3,7 @@
 # Uso: ./recon_pasivo.sh dominio.com
 
 set -e  # Salir si hay error
-
+set -o pipefail
 # Validación
 if [ $# -ne 1 ]; then
     echo "❌ Uso: $0 <dominio>"
@@ -28,7 +28,7 @@ fi
 
 # 1. Extrae robots.txt
 echo "[*] Extrayendo robots.txt..." | tee -a "$LOG_FILE"
-if curl -s -L "https://$DOMAIN/robots.txt" > "$OUTPUT_DIR/robots.txt" 2>/dev/null; then
+if curl -sfL "https://$DOMAIN/robots.txt" > "$OUTPUT_DIR/robots.txt" 2>/dev/null; then
     echo "✓ robots.txt descargado" | tee -a "$LOG_FILE"
 else
     echo "⚠ No se pudo obtener robots.txt" | tee -a "$LOG_FILE"
